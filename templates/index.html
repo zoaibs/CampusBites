@@ -6,55 +6,57 @@
     <title>CampusBites</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
         body {
             font-family: Comfortaa;
             background-image: url("/static/waves-bg.svg");
             background-position-y: bottom;
-            /* background-position: center; */
             background-repeat: no-repeat;
             background-size: cover;
             display: flex;
             flex-direction: column;
-            /* justify-content: center; */
             align-items: center;
             height: 100vh;
             margin: 0;
             background-color: #f4f4f4;
         }
         h1 {
-            font-size: 3rem;
+            font-size: 4.3rem;
+            font-weight: 500;
+            margin-top: 10vw;
+        }
+        h1 span {
+            color: #00bf63;
             font-weight: bold;
-            margin: 0; /* Remove margin to center the image better */
         }
         p {
             font-size: 1.4rem;
             margin-bottom: 5vw;
-            color: #00bf63; /* Accent green for text */
+            color: #00bf63;
         }
         button {
             font-family: Comfortaa;
             padding: 25px 40px;
             font-size: 1.7rem;
-            background-color: #00bf63; /* Accent green for button background */
-            color: white; /* White text coer contrast */
-            border: 0.1em solid white; /* Remove border for cleaner look */
+            background-color: #00bf63;
+            color: white;
+            border: 0.1em solid white;
             border-radius: 10px;
             cursor: pointer;
         }
         button:hover {
-            background-color: #008f4a; /* Darker green for hover effect */
-
+            background-color: #008f4a;
         }
         img {
             margin-top: 10vw;
-            width: 20vw; /* Adjust width as needed */
-            height: auto; /* Maintain aspect ratio */
-            margin-bottom: 5vw; /* Space below the image */
+            width: 20vw;
+            height: auto;
+            margin-bottom: 5vw;
         }
     </style>
 </head>
 <body>
-    <img src="/static/logo.png" style="width: 35vw;">
+    <h1>C<span>A</span>MPUSB<span>I</span>TES</h1>
     <p>The AI powered meal suggester for meeting your fitness goals.</p>
     <button onclick="window.location.href='/form'">Get Started</button>
 </body>
