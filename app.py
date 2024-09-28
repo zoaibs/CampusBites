@@ -11,7 +11,7 @@ def form():
     if request.method == "POST":
         # Get data from the form
         height = request.form.get("height")
-        gender = request.form.get("gender")
+        sex = request.form.get("sex")
         weight = request.form.get("weight")
         goal_weight = request.form.get("goal_weight")
         goal_time = request.form.get("goal_time")
