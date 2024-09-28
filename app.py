@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-import main
+import main2
 app = Flask(__name__)
 
 @app.route("/")
@@ -20,18 +20,12 @@ def form():
         
         # Sample logic for generating meal suggestion based on meal type
 
-        main.process_user_data(height, weight, goal_weight, goal_time, sex, dining_hall, meal_type)
-        meal_suggestions = {
-            "breakfast": ("Oatmeal with fruits", 300),
-            "lunch": ("Grilled chicken salad", 450),
-            "dinner": ("Quinoa with steamed veggies", 500)
-        }
-
-        # Get the suggested meal and calories for the selected meal type
-        suggested_meal, calories = meal_suggestions.get(meal_type, ("Unknown", 0))
+        meal_data = main2.process_user_data(height, weight, goal_weight, goal_time, sex, dining_hall, meal_type)
+        
+        
         
         # Redirect to the meal suggestion page with the user's data
-        return redirect(url_for("meal_suggestion", meal=suggested_meal, calories=calories))
+        return redirect(url_for("meal_suggestion", meal=meal_data, calories=200))
 
     return render_template("form.html")
 
