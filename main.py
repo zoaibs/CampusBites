@@ -16,18 +16,18 @@ def load_menu_data(json_file, dining_hall, meal_type):
     return menu
 
 # Define the user profile
-def get_user_profile(weight, weight_goal, gender):
-    return {'weight': weight, 'weight_goal': weight_goal, 'gender': gender}
+def get_user_profile(weight, weight_goal, gender, height):
+    return {'weight': weight, 'weight_goal': weight_goal, 'gender': gender, 'height': height}
 
 # Estimate daily caloric needs using the Mifflin-St Jeor formula
 def estimate_daily_calories(user_profile):
     weight = user_profile['weight']
     gender = user_profile['gender']
-    
-    if gender.upper() == 'male':
-        calories = 10 * weight + 6.25 * 170 - 5 * 25 + 5  # Simplified for males, assuming height and age
+    height = user_profile['height']
+    if gender.upper() == 'MALE':
+        calories = 10 * weight + 6.25 * height - 5 * 25 + 5  # Simplified for males, assuming height and age
     else:
-        calories = 10 * weight + 6.25 * 160 - 5 * 25 - 161  # Simplified for females, assuming height and age
+        calories = 10 * weight + 6.25 * height - 5 * 25 - 161  # Simplified for females, assuming height and age
 
     # Adjust based on weight goal (e.g., weight loss reduces daily intake)
     weight_goal_diff = user_profile['weight_goal'] - user_profile['weight']
@@ -138,7 +138,7 @@ def display_meal(meal, total_calories, total_protein, total_fat, total_carbs, to
 
 
 
-def process_user_data(height, weight, goal_weight, goal_time, sex, dining_hall, meal_type):
+def process_user_data(height, weight, goal_weight, goal_time, gender, dining_hall, meal_type):
     # Load menu data
     menu = load_menu_data('menu.json', dining_hall, meal_type)
     if not menu:
@@ -146,7 +146,7 @@ def process_user_data(height, weight, goal_weight, goal_time, sex, dining_hall, 
         return
 
     # Create a user profile
-    user_profile = get_user_profile(weight, goal_weight, sex)
+    user_profile = get_user_profile(weight, goal_weight, gender, height)
 
     # Estimate daily caloric needs
     daily_calories = estimate_daily_calories(user_profile)
@@ -165,5 +165,5 @@ def process_user_data(height, weight, goal_weight, goal_time, sex, dining_hall, 
     display_meal(meal, total_calories, total_protein, total_fat, total_carbs, total_fiber, total_vitamins, total_minerals)
 
 if __name__ == "__main__":
-    pass
+    process_user_data(170, 60, 70, 2, "male", "North Ave Dining Hall", "Breakfast")
     
