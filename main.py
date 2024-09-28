@@ -10,6 +10,7 @@ import sys
 def load_menu_data(json_file, dining_hall, meal_type):
     print("Attempting to load menu data...")
     menu = getMeal(dining_hall, meal_type)
+    print(menu)
     if menu is None:
         print("Failed to load menu data. Please check the LLMnutritiongen module and the AI model's response.")
         return []  # Return an empty list instead of None
@@ -18,20 +19,22 @@ def load_menu_data(json_file, dining_hall, meal_type):
 
 # Define the user profile
 def get_user_profile(weight, weight_goal, gender, height):
-    return {'weight': weight, 'weight_goal': weight_goal, 'gender': gender, 'height': height}
+    return {'weight': int(weight), 'weight_goal': int(weight_goal), 'gender': gender, 'height': int(height)}
 
 # Estimate daily caloric needs using the Mifflin-St Jeor formula
 # Estimate daily caloric needs using the Mifflin-St Jeor formula
 def estimate_daily_calories(user_profile, goal_time_weeks):
-    weight = user_profile['weight']
+    weight = int(user_profile['weight'])
     gender = user_profile['gender']
-    height = user_profile['height']
+    height = int(user_profile['height'])
+
+    print(type(height))
 
     # Calculate weight difference
-    weight_goal_diff = user_profile['weight_goal'] - weight
+    weight_goal_diff = int(user_profile['weight_goal']) - int(weight)
 
     # Calculate weight change per week
-    weight_change_per_week = weight_goal_diff / goal_time_weeks
+    weight_change_per_week = weight_goal_diff / float(goal_time_weeks)
 
     # Check for safe weight change limits
     if weight_change_per_week > 1:
@@ -180,14 +183,20 @@ def display_meal(meal, total_calories, total_protein, total_fat, total_carbs, to
     print(f"Total Minerals: {total_minerals} (arbitrary units)")
 
 def process_user_data(height, weight, goal_weight, goal_time, gender, dining_hall, meal_type):
+    
     # Load menu data
     menu = load_menu_data('menu.json', dining_hall, meal_type)
     if not menu:
         print("No menu items were loaded. Exiting.")
         return
 
+    height = int(height)
+    weight = int(weight)
+    goal_weight = int(goal_weight)
+    goal_time = int(goal_time)
+
     # Create a user profile
-    user_profile = get_user_profile(weight, goal_weight, gender, height)
+    user_profile = get_user_profile(int(weight), int(goal_weight), gender, int(height))
 
     # Convert goal_time from months to weeks
     goal_time_weeks = goal_time * 4  # Assuming 4 weeks in a month

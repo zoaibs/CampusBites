@@ -5,6 +5,7 @@ import numpy as np
 from LLMnutritiongen import *
 import argparse
 import sys
+
 # Load dining hall menu data from a JSON file
 def load_menu_data(json_file, dining_hall, meal_type):
     print("Attempting to load menu data...")
@@ -20,23 +21,40 @@ def get_user_profile(weight, weight_goal, gender, height):
     return {'weight': weight, 'weight_goal': weight_goal, 'gender': gender, 'height': height}
 
 # Estimate daily caloric needs using the Mifflin-St Jeor formula
-def estimate_daily_calories(user_profile):
+# Estimate daily caloric needs using the Mifflin-St Jeor formula
+def estimate_daily_calories(user_profile, goal_time_weeks):
     weight = user_profile['weight']
     gender = user_profile['gender']
     height = user_profile['height']
+
+    # Calculate weight difference
+    weight_goal_diff = user_profile['weight_goal'] - weight
+
+    # Calculate weight change per week
+    weight_change_per_week = weight_goal_diff / goal_time_weeks
+
+    # Check for safe weight change limits
+    if weight_change_per_week > 1:
+        print("Warning: Gaining more than 1 kg per week is not advised. Are you sure you want to proceed?")
+    elif weight_change_per_week < -1:
+        print("Warning: Losing more than 1 kg per week is not advised. Are you sure you want to proceed?")
+
+    # Base calorie calculation using Mifflin-St Jeor formula
     if gender.upper() == 'MALE':
-        calories = 10 * weight + 6.25 * height - 5 * 25 + 5  # Simplified for males, assuming height and age
+        bmr = 10 * weight + 6.25 * height - 5 * 25 + 5  # Replace 25 with actual age if needed
     else:
-        calories = 10 * weight + 6.25 * height - 5 * 25 - 161  # Simplified for females, assuming height and age
+        bmr = 10 * weight + 6.25 * height - 5 * 25 - 161  # Replace 25 with actual age if needed
 
-    # Adjust based on weight goal (e.g., weight loss reduces daily intake)
-    weight_goal_diff = user_profile['weight_goal'] - user_profile['weight']
-    if weight_goal_diff < 0:
-        calories -= 500   # 500 calorie deficit for weight loss
-    elif weight_goal_diff > 0:
-        calories += 500  # 500 calorie surplus for weight gain
+    # Daily caloric change based on weight goal
+    daily_caloric_change = (weight_change_per_week * 7700) / 7  # Daily caloric change
+    print(daily_caloric_change)
+    # Calculate daily caloric needs based on weight change goal
+    bmr = bmr*1.55
+    daily_calories = bmr + daily_caloric_change  # Subtract caloric deficit
 
-    return calories
+    print(f"Estimated Daily Calories: {daily_calories:.2f} kcal")
+    return daily_calories
+
 
 # Train a simple random forest model to predict the best meal
 def train_model(menu):
@@ -45,7 +63,6 @@ def train_model(menu):
     
     # Create feature vectors (calories, protein, fat, carbs) and target (total calories)
     for name in menu:
-        
         feature = [name['calories'], name['protein'], name['fat'], name['carbs'], name['fibers'], name['vitamins'], name['minerals']]
         features.append(feature)
         labels.append(name['calories'])  # We'll use total calories as a label for simplicity
@@ -58,6 +75,7 @@ def train_model(menu):
     model = RandomForestRegressor(n_estimators=100)
     model.fit(X, y)
     return model
+
 def get_macronutrient_targets(daily_calories):
     # Define percentage goals for macronutrients
     carb_ratio = 0.40  # 40% of calories from carbs
@@ -74,9 +92,10 @@ def get_macronutrient_targets(daily_calories):
 
     return carb_target, protein_target, fat_target, fiber_target, vitamin_target, mineral_target
 
-
 # Recommend a meal based on the user's daily caloric needs
 # Recommend a meal based on the user's daily caloric needs
+# Recommend a meal based on the user's daily caloric needs
+# Recommend a meal based on the user's daily caloric needs and macronutrient balance
 def recommend_meal(model, menu, daily_calories):
     meal = []
     total_calories = 0
@@ -89,33 +108,58 @@ def recommend_meal(model, menu, daily_calories):
 
     # Get target macronutrient values
     carb_target, protein_target, fat_target, fiber_target, vitamin_target, mineral_target = get_macronutrient_targets(daily_calories)
-    
-    # Filter meals that fit the macronutrient constraints
-    filtered_menu = [name for name in menu if (name['protein'] <= protein_target and
-                                               name['fat'] <= fat_target and
-                                               name['carbs'] <= carb_target and
-                                               name['fibers'] <= fiber_target and
-                                               name['vitamins'] <= vitamin_target and
-                                               name['minerals'] <= mineral_target)]  # Include vitamins and minerals in the filter
 
-    # If no meals fit the criteria, return an empty meal plan
-    if not filtered_menu:
-        print("No meals match the macronutrient targets.")
-        return meal, total_calories, total_protein, total_fat, total_carbs, total_fiber, total_vitamins, total_minerals
-    
-    # Keep adding meals until the total calories meet or exceed the daily requirement
-    while total_calories < daily_calories:
-        name = random.choice(filtered_menu)
+    # Allowable deviation from macronutrient target (e.g., 10% tolerance)
+    deviation = 0.10
+
+    # Function to calculate macro balance score based on deviation from target macros
+    def macro_balance_score(item):
+        carb_score = abs((item['carbs'] / (item['calories'] * 4)) - carb_target / daily_calories)
+        protein_score = abs((item['protein'] / (item['calories'] * 4)) - protein_target / daily_calories)
+        fat_score = abs((item['fat'] / (item['calories'] * 9)) - fat_target / daily_calories)
+        return carb_score + protein_score + fat_score
+
+    # Sort menu based on how close they match the macronutrient targets
+    sorted_menu = sorted(menu, key=macro_balance_score)
+
+    # Keep adding meals until total calories meet or exceed the daily requirement
+    for name in sorted_menu:
+        if total_calories >= daily_calories:
+            break
+
         prediction = model.predict([[name['calories'], name['protein'], name['fat'], name['carbs'], name['fibers'], name['vitamins'], name['minerals']]])[0]
 
-        meal.append(name)
-        total_calories += prediction
-        total_protein += name['protein']
-        total_fat += name['fat']
-        total_carbs += name['carbs']
-        total_fiber += name['fibers']
-        total_vitamins += name['vitamins']
-        total_minerals += name['minerals']
+        # Only add the meal if the macronutrients are reasonably close to the target
+        protein_ratio = (total_protein + name['protein']) / (total_calories + name['calories'])
+        fat_ratio = (total_fat + name['fat']) / (total_calories + name['calories'])
+        carb_ratio = (total_carbs + name['carbs']) / (total_calories + name['calories'])
+
+        if (abs(protein_ratio - protein_target / daily_calories) <= deviation and
+            abs(fat_ratio - fat_target / daily_calories) <= deviation and
+            abs(carb_ratio - carb_target / daily_calories) <= deviation):
+            
+            # Add the meal if within the tolerance
+            meal.append(name)
+            total_calories += prediction
+            total_protein += name['protein']
+            total_fat += name['fat']
+            total_carbs += name['carbs']
+            total_fiber += name['fibers']
+            total_vitamins += name['vitamins']
+            total_minerals += name['minerals']
+
+    # In case no meals meet the target, relax the constraint and choose from the best matches
+    if not meal:
+        print("No meals perfectly match the macronutrient targets. Relaxing constraints.")
+        meal = sorted_menu[:3]  # Take top 3 best-matched meals as fallback
+        for name in meal:
+            total_calories += name['calories']
+            total_protein += name['protein']
+            total_fat += name['fat']
+            total_carbs += name['carbs']
+            total_fiber += name['fibers']
+            total_vitamins += name['vitamins']
+            total_minerals += name['minerals']
 
     return meal, total_calories, total_protein, total_fat, total_carbs, total_fiber, total_vitamins, total_minerals
 
@@ -134,10 +178,6 @@ def display_meal(meal, total_calories, total_protein, total_fat, total_carbs, to
     print(f"Total Fiber: {total_fiber} g")
     print(f"Total Vitamins: {total_vitamins} (arbitrary units)")
     print(f"Total Minerals: {total_minerals} (arbitrary units)")
-    
-
-
-
 
 def process_user_data(height, weight, goal_weight, goal_time, gender, dining_hall, meal_type):
     # Load menu data
@@ -149,9 +189,12 @@ def process_user_data(height, weight, goal_weight, goal_time, gender, dining_hal
     # Create a user profile
     user_profile = get_user_profile(weight, goal_weight, gender, height)
 
+    # Convert goal_time from months to weeks
+    goal_time_weeks = goal_time * 4  # Assuming 4 weeks in a month
+
     # Estimate daily caloric needs
-    daily_calories = estimate_daily_calories(user_profile)
-    print(f"Estimated Daily Calories: {daily_calories} kcal")
+    meal_calories = estimate_daily_calories(user_profile, goal_time_weeks) / 3  # Dividing by 3 for meal planning
+    print(f"Estimated Daily Calories: {meal_calories} kcal")
 
     # Train the model using the loaded menu
     model = train_model(menu)
@@ -160,13 +203,10 @@ def process_user_data(height, weight, goal_weight, goal_time, gender, dining_hal
         return
 
     # Recommend a meal based on daily caloric needs
-    meal, total_calories, total_protein, total_fat, total_carbs, total_fiber, total_vitamins, total_minerals = recommend_meal(model, menu, daily_calories)
+    meal, total_calories, total_protein, total_fat, total_carbs, total_fiber, total_vitamins, total_minerals = recommend_meal(model, menu, meal_calories)
 
     # Display the recommended meal plan
     display_meal(meal, total_calories, total_protein, total_fat, total_carbs, total_fiber, total_vitamins, total_minerals)
-    
-    return {meal, total_calories, total_protein, total_fat, total_carbs, total_fiber, total_vitamins, total_minerals}
 
 if __name__ == "__main__":
-    process_user_data(170, 60, 70, 2, "male", "North Ave Dining Hall", "Breakfast")
-    
+    process_user_data(170, 60, 70, 3, "male", "North Ave Dining Hall", "Dinner")

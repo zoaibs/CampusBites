@@ -59,18 +59,18 @@ def scrapeMenu(dining_hall, meal):
                 meal_option.click()
                 break
 
-    # WebDriverWait(driver, 10).until(
-    #     EC.visibility_of_element_located((By.CLASS_NAME, 'ns-icon-down-chevron'))
-    # )
+    WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located((By.CLASS_NAME, 'ns-icon-down-chevron'))
+    )
 
     collapse_buttons = driver.find_elements(By.CLASS_NAME, "ns-icon-down-chevron")
 
     for collapse_button in collapse_buttons:
         collapse_button.click()
 
-    # WebDriverWait(driver, 10).until(
-    #     EC.visibility_of_element_located((By.CLASS_NAME, 'food-name'))
-    # )
+    WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located((By.CLASS_NAME, 'food-name'))
+    )
 
     food_items = driver.find_elements(By.CLASS_NAME, "food-name")
 
