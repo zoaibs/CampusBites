@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Information</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap');
+        body {
+            font-family: Comfortaa;
+            background-image: url("/static/blobs-bg.svg");
+            background-position-y: -2em;
+            /* background-position: center; */
+            background-repeat: no-repeat;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #ffffff;
+        }
+        h1 {
+            font-family: Comfortaa;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        form {
+            font-family: Comfortaa;
+            display: flex;
+            flex-direction: column;
+            width: 20em;
+            background-color: #ffffff;
+        }
+        input, select {
+            font-family: Comfortaa;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            border-radius: 0.5em;
+        }
+        button {
+            font-family: Comfortaa;
+            padding: 10px;
+            font-size: 1rem;
+            background-color: #fff;
+            border: 2px solid #000;
+            border-radius: 2em;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #00bf63;
+        }
+        label {
+            margin-bottom: .2em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Enter Your Info</h1>
+    <form method="POST">
+        <input type="number" name="height" placeholder="Height (in)" min="0" required>
+        <input type="number" name="weight" placeholder="Weight (lbs)" min="0" required>
+        <input type="number" name="goal_weight" placeholder="Goal Weight (lbs)" min="0" required>
+        <input type="number" name="goal_time" placeholder="Time to reach your goal (months)?" min="0" required>
+
+        <label for="gender">Gender:</label>
+        <select name="gender" id="gender" required>
+            <option value="" disabled selected>Select your gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+        </select>
+
+        <label for="dining_hall">Dining Hall:</label>
+        <select name="dining_hall" id="dining_hall" required>
+            <option value="" disabled selected>Select a dining hall</option>
+            <option value="North Ave Dining Hall">North Avenue</option>
+            <option value="West Village">West Village</option>
+        </select>
+
+        <label for="meal_type">Meal Type:</label>
+        <select name="meal_type" id="meal_type" required>
+            <option value="" disabled selected>Select a meal type</option>
+            <option value="breakfast">Breakfast</option>
+            <option value="lunch">Lunch</option>
+            <option value="dinner">Dinner</option>
+        </select>
+
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
