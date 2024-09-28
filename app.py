@@ -14,6 +14,7 @@ def form():
         gender = request.form.get("gender")
         weight = request.form.get("weight")
         goal_weight = request.form.get("goal_weight")
+        goal_time = request.form.get("goal_time")
         dining_hall = request.form.get("dining_hall")
         meal_type = request.form.get("meal_type")
         main.main()
