@@ -17,8 +17,10 @@ def form():
         goal_time = request.form.get("goal_time")
         dining_hall = request.form.get("dining_hall")
         meal_type = request.form.get("meal_type")
-        main.main()
+        
         # Sample logic for generating meal suggestion based on meal type
+
+        main.process_user_data(height, weight, goal_weight, goal_time, sex, dining_hall, meal_type)
         meal_suggestions = {
             "breakfast": ("Oatmeal with fruits", 300),
             "lunch": ("Grilled chicken salad", 450),
@@ -30,7 +32,7 @@ def form():
         
         # Redirect to the meal suggestion page with the user's data
         return redirect(url_for("meal_suggestion", meal=suggested_meal, calories=calories))
-    
+
     return render_template("form.html")
 
 @app.route("/meal_suggestion")

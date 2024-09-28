@@ -3,10 +3,12 @@ import random
 from sklearn.ensemble import RandomForestRegressor
 import numpy as np
 from LLMnutritiongen import *
+import argparse
+import sys
 # Load dining hall menu data from a JSON file
-def load_menu_data(json_file):
+def load_menu_data(json_file, dining_hall, meal_type):
     print("Attempting to load menu data...")
-    menu = getMeal("North Ave Dining Hall", "Breakfast")
+    menu = getMeal(dining_hall, meal_type)
     if menu is None:
         print("Failed to load menu data. Please check the LLMnutritiongen module and the AI model's response.")
         return []  # Return an empty list instead of None
@@ -14,10 +16,7 @@ def load_menu_data(json_file):
     return menu
 
 # Define the user profile
-def get_user_profile():
-    weight = float(input("Enter your current weight (in kg): "))
-    weight_goal = float(input("Enter your weight goal (in kg): "))
-    gender = input("Enter your gender (M/F): ")
+def get_user_profile(weight, weight_goal, gender):
     return {'weight': weight, 'weight_goal': weight_goal, 'gender': gender}
 
 # Estimate daily caloric needs using the Mifflin-St Jeor formula
@@ -25,7 +24,7 @@ def estimate_daily_calories(user_profile):
     weight = user_profile['weight']
     gender = user_profile['gender']
     
-    if gender.upper() == 'M':
+    if gender.upper() == 'male':
         calories = 10 * weight + 6.25 * 170 - 5 * 25 + 5  # Simplified for males, assuming height and age
     else:
         calories = 10 * weight + 6.25 * 160 - 5 * 25 - 161  # Simplified for females, assuming height and age
@@ -138,23 +137,26 @@ def display_meal(meal, total_calories, total_protein, total_fat, total_carbs, to
 
 
 
-def run(height, weight, goal_weight, gender, dining_hall, meal_type):
-    
 
-"""if __name__ == "__main__":
-    menu = load_menu_data('menu.json')
+def process_user_data(height, weight, goal_weight, goal_time, sex, dining_hall, meal_type):
+    # Load menu data
+    menu = load_menu_data('menu.json', dining_hall, meal_type)
     if not menu:
         print("No menu items were loaded. Exiting.")
-        exit(1)
+        return
 
-    user_profile = get_user_profile()
+    # Create a user profile
+    user_profile = get_user_profile(weight, goal_weight, sex)
+
+    # Estimate daily caloric needs
     daily_calories = estimate_daily_calories(user_profile)
     print(f"Estimated Daily Calories: {daily_calories} kcal")
 
+    # Train the model using the loaded menu
     model = train_model(menu)
     if model is None:
         print("Could not train the model. Exiting.")
-        exit(1)
+        return
 
     # Recommend a meal based on daily caloric needs
     meal, total_calories, total_protein, total_fat, total_carbs, total_fiber, total_vitamins, total_minerals = recommend_meal(model, menu, daily_calories)
@@ -162,4 +164,6 @@ def run(height, weight, goal_weight, gender, dining_hall, meal_type):
     # Display the recommended meal plan
     display_meal(meal, total_calories, total_protein, total_fat, total_carbs, total_fiber, total_vitamins, total_minerals)
 
-"""
+if __name__ == "__main__":
+    pass
+    
