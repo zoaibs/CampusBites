@@ -5,44 +5,156 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meal Suggestion</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap');
+        
         body {
-            font-family: Arial, sans-serif;
+            font-family: Comfortaa;
+            background-image: url("/static/blobs-corner-bg.svg");
+            background-position-y: -8.5em;
+            background-repeat: no-repeat;
+            background-size: cover;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f4f4f4;
+            background-color: #ffffff;
         }
+
         h1 {
             font-size: 2.5rem;
+            font-weight: bold;
             margin-bottom: 20px;
         }
-        p {
-            font-size: 1.25rem;
-            margin-bottom: 15px;
+
+        .meal-text {
+            color: #00bf63; /* Green for "Your suggested meal" */
+            font-weight: bold;
         }
+
+        .meal-name {
+            color: black; /* Black for meal name */
+            font-weight: normal;
+        }
+
+        table {
+            width: 60%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 1em;
+            border: 1px solid black;
+            border-radius: 1px;
+            overflow: hidden;
+        }
+
+        td, th {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        th {
+            font-weight: bold;
+            background-color: #f0f0f0;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.3em;
+        }
+
+        .macros {
+            font-size: 1.2rem;
+            font-weight: bold;
+            width: 30%;
+            text-align: center; /* Center horizontally */
+            margin-bottom: 1em;
+            border: 1px solid black;
+            border-radius: 1px;
+            overflow: hidden;
+        }
+
+        .macros td {
+            padding: 10px;
+            border: 1px solid black;
+        }
+
         button {
+            font-family: Comfortaa;
             padding: 10px;
             font-size: 1rem;
             background-color: #fff;
             border: 2px solid #000;
-            border-radius: 10px;
+            border-radius: 3px;
             cursor: pointer;
         }
+
         button:hover {
-            background-color: #e0e0e0;
+            background-color: #00bf63; /* Accent green for hover effect */
+            color: white;
+            border: 2px solid #00bf63; /* Match border with hover color */
         }
+
+        a {
+            text-decoration: none; /* Remove underline from links */
+        }
+
     </style>
 </head>
 <body>
-    <h1>Your Suggested Meal</h1>
-    <p>Meal: {{ meal }}</p>
-    <p>Calories: {{ calories }} kcal</p>
-    <p>Fat: 10g</p>
-    <p>Protein: 10g</p>
-    <p>Carbs: 10g</p>
+    <h1><span class="meal-text">Your Meal:</span> <span class="meal-name">Caesar Chicken Salad</span></h1>
+    
+    <div class="section-title">Ingredients</div>
+
+    <table>
+        <tr>
+            <th>Ingredient</th>
+            <th>Serving Size</th>
+            <th>Calories</th>
+        </tr>
+        <tr>
+            <td>Chicken</td>
+            <td>--- g</td>
+            <td>--- kcal</td>
+        </tr>
+        <tr>
+            <td>Salad</td>
+            <td>--- g</td>
+            <td>--- kcal</td>
+        </tr>
+    </table>
+
+    <div class="section-title">Total Macros:</div>
+
+    <table class="macros">
+        <tr>
+            <td>Fat:</td>
+            <td>--- g</td>
+        </tr>
+        <tr>
+            <td>Protein:</td>
+            <td>--- g</td>
+        </tr>
+        <tr>
+            <td>Carbs:</td>
+            <td>--- g</td>
+        </tr>
+        <tr>
+            <td>Vitamins:</td>
+            <td>--- g</td>
+        </tr>
+        <tr>
+            <td>Minerals:</td>
+            <td>--- g</td>
+        </tr>
+        <tr>
+            <td>Fiber:</td>
+            <td>--- g</td>
+        </tr>
+    </table>
 
     <a href="{{ url_for('form') }}">
         <button>Go Back</button>
