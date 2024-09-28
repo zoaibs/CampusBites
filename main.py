@@ -3,7 +3,6 @@ import random
 from sklearn.ensemble import RandomForestRegressor
 import numpy as np
 from LLMnutritiongen import *
-
 # Load dining hall menu data from a JSON file
 def load_menu_data(json_file):
     print("Attempting to load menu data...")
@@ -139,8 +138,10 @@ def display_meal(meal, total_calories, total_protein, total_fat, total_carbs, to
 
 
 
-# Main execution
-if __name__ == "__main__":
+def run(height, weight, goal_weight, gender, dining_hall, meal_type):
+    
+
+"""if __name__ == "__main__":
     menu = load_menu_data('menu.json')
     if not menu:
         print("No menu items were loaded. Exiting.")
@@ -161,3 +162,4 @@ if __name__ == "__main__":
     # Display the recommended meal plan
     display_meal(meal, total_calories, total_protein, total_fat, total_carbs, total_fiber, total_vitamins, total_minerals)
 
+"""

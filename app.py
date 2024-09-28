@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-
+import main
 app = Flask(__name__)
 
 @app.route("/")
@@ -16,7 +16,7 @@ def form():
         goal_weight = request.form.get("goal_weight")
         dining_hall = request.form.get("dining_hall")
         meal_type = request.form.get("meal_type")
-        
+        main.main()
         # Sample logic for generating meal suggestion based on meal type
         meal_suggestions = {
             "breakfast": ("Oatmeal with fruits", 300),
