@@ -5,25 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meal Suggestion</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap');
+        
         body {
-            font-family: Arial, sans-serif;
+            font-family: Comfortaa;
+            background-image: url("/static/blobs-corner-bg.svg");
+            background-position-y: -8.5em;
+            background-repeat: no-repeat;
+            background-size: cover;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f4f4f4;
+            background-color: #ffffff;
         }
+
         h1 {
             font-size: 2.5rem;
+            font-weight: bold;
             margin-bottom: 20px;
+            color: #00bf63; /* Green accent color */
         }
+
         p {
             font-size: 1.25rem;
             margin-bottom: 15px;
+            color: #333; /* Darker text color for better contrast */
         }
+
         button {
+            font-family: Comfortaa;
             padding: 10px;
             font-size: 1rem;
             background-color: #fff;
@@ -31,8 +44,15 @@
             border-radius: 10px;
             cursor: pointer;
         }
+
         button:hover {
-            background-color: #e0e0e0;
+            background-color: #00bf63; /* Accent green for hover effect */
+            color: white;
+            border: 2px solid #00bf63; /* Match border with hover color */
+        }
+
+        a {
+            text-decoration: none; /* Remove underline from links */
         }
     </style>
 </head>
