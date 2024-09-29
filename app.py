@@ -19,7 +19,11 @@ def form():
         meal_type = request.form.get("meal_type")
         
         # Sample logic for generating meal suggestion based on meal type
+<<<<<<< Updated upstream
 
+=======
+        #print(meal_type)
+>>>>>>> Stashed changes
         meal_data = main.process_user_data(height, weight, goal_weight, goal_time, sex, dining_hall, meal_type)
         
         
@@ -39,3 +43,4 @@ def meal_suggestion():
 
 if __name__ == "__main__":
     app.run(debug=True)
+    

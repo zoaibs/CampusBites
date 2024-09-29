@@ -30,6 +30,8 @@ def estimate_daily_calories(user_profile, goal_time_weeks):
 
     print(type(height))
 
+    print(type(height))
+
     # Calculate weight difference
     weight_goal_diff = int(user_profile['weight_goal']) - int(weight)
 
@@ -142,7 +144,28 @@ def recommend_meal(model, menu, daily_calories):
             abs(carb_ratio - carb_target / daily_calories) <= deviation):
             
             # Add the meal if within the tolerance
-            meal.append(name)
+            if name not in meal:
+                meal.append(name)
+            else:
+                idx = meal.index(name)
+                if 'two servings' in meal[idx]['name']:
+                    meal[idx]['name'] = meal[idx]['name'].replace('two servings', 'three servings')
+                elif 'servings' in meal[idx]['name']:
+                    # If it already has multiple servings, increase the count
+                    count = int(meal[idx]['name'].split()[0])
+                    meal[idx]['name'] = meal[idx]['name'].replace(f'{count} servings', f'{count + 1} servings')
+                else:
+                    # First duplication, rename to "two servings"
+                    meal[idx]['name'] = f"two servings of {meal[idx]['name']}"
+
+    # Add the macronutrients and calories to the existing item
+                meal[idx]['calories'] += name['calories']
+                meal[idx]['protein'] += name['protein']
+                meal[idx]['fat'] += name['fat']
+                meal[idx]['carbs'] += name['carbs']
+                meal[idx]['fibers'] += name['fibers']
+                meal[idx]['vitamins'] += name['vitamins']
+                meal[idx]['minerals'] += name['minerals']
             total_calories += prediction
             total_protein += name['protein']
             total_fat += name['fat']
@@ -156,6 +179,7 @@ def recommend_meal(model, menu, daily_calories):
         print("No meals perfectly match the macronutrient targets. Relaxing constraints.")
         meal = sorted_menu[:3]  # Take top 3 best-matched meals as fallback
         for name in meal:
+            
             total_calories += name['calories']
             total_protein += name['protein']
             total_fat += name['fat']
@@ -185,6 +209,11 @@ def display_meal(meal, total_calories, total_protein, total_fat, total_carbs, to
 def process_user_data(height, weight, goal_weight, goal_time, gender, dining_hall, meal_type):
     
     # Load menu data
+
+    height = int(height)
+    weight = int(weight)
+    goal_weight = int(goal_weight)
+    goal_time= int(goal_time)
     menu = load_menu_data('menu.json', dining_hall, meal_type)
     if not menu:
         print("No menu items were loaded. Exiting.")
