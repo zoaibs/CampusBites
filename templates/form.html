@@ -10,8 +10,6 @@
             font-family: Comfortaa;
             background-image: url("/static/blobs-bg.svg");
             background-position-y: -4.5em;
-            
-            /* background-position: center; */
             background-repeat: no-repeat;
             background-size: cover;
             display: flex;
@@ -23,26 +21,22 @@
             background-color: #ffffff;
         }
         h1 {
-            font-family: Comfortaa;
             font-size: 2.5rem;
             margin-bottom: 20px;
         }
         form {
-            font-family: Comfortaa;
             display: flex;
             flex-direction: column;
             width: 20em;
             background-color: #ffffff;
         }
         input, select {
-            font-family: Comfortaa;
             padding: 10px;
             margin-bottom: 15px;
             font-size: 1rem;
             border-radius: 0.5em;
         }
         button {
-            font-family: Comfortaa;
             padding: 10px;
             font-size: 1rem;
             background-color: #fff;
@@ -56,21 +50,69 @@
         label {
             margin-bottom: .2em;
         }
+        #warning-message {
+            color: red;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            display: none;
+        }
     </style>
+    <script>
+        function validateForm(event) {
+            // Get form values
+            const weight = parseFloat(document.querySelector('input[name="weight"]').value);
+            const goalWeight = parseFloat(document.querySelector('input[name="goal_weight"]').value);
+            const goalTime = parseFloat(document.querySelector('input[name="goal_time"]').value);
+
+            // Calculate weight change per week
+            const weightChangePerWeek = (goalWeight - weight) / (goalTime * 4);
+
+            // Reference to the warning message and button
+            const warningMessage = document.getElementById("warning-message");
+            const submitButton = document.querySelector("button[type='submit']");
+
+            // Check for unsafe weight change and prevent submission if necessary
+            if (weightChangePerWeek > 1 || weightChangePerWeek < -1) {
+                event.preventDefault(); // Prevent form submission
+                warningMessage.style.display = "block"; // Show warning message
+                warningMessage.textContent = "Unhealthy weight change! Please enter a safer goal or timeframe.";
+                submitButton.textContent = "Retry"; // Change button text to "Retry"
+            } else {
+                warningMessage.style.display = "none"; // Hide the warning if values are valid
+            }
+        }
+
+        // Function to reset form
+        function resetForm() {
+            document.querySelector("form").reset(); // Reset form fields
+            document.getElementById("warning-message").style.display = "none"; // Hide warning message
+            document.querySelector("button[type='submit']").textContent = "Submit"; // Reset button text
+        }
+    </script>
 </head>
 <body>
     <h1>Enter Your Info</h1>
-    <form method="POST">
+    <form method="POST" onsubmit="validateForm(event)">
         <input type="number" name="height" placeholder="Height (cm)" min="0" required>
         <input type="number" name="weight" placeholder="Weight (kg)" min="0" required>
         <input type="number" name="goal_weight" placeholder="Goal Weight (kg)" min="0" required>
-        <input type="number" name="goal_time" placeholder="Time to reach your goal (months)?" min="0" required>
+        <input type="number" name="goal_time" placeholder="Time to reach your goal (months)" min="0" required>
 
         <label for="sex">Sex:</label>
         <select name="sex" id="sex" required>
             <option value="" disabled selected>Select your gender</option>
             <option value="male">Male</option>
             <option value="female">Female</option>
+        </select>
+
+        <label for="bmr_scale">Exercise:</label>
+        <select name="bmr_scale" id="bmr_scale" required>
+            <option value="" disabled selected>Select your gender</option>
+            <option value="1.2">Little to no exercise</option>
+            <option value="1.375">Light exercise</option>
+            <option value="1.55">Moderate exercise</option>
+            <option value="1.725">Very active</option>
+
         </select>
 
         <label for="dining_hall">Dining Hall:</label>
@@ -88,7 +130,17 @@
             <option value="Dinner">Dinner</option>
         </select>
 
+        <p id="warning-message"></p>
+
         <button type="submit">Submit</button>
     </form>
+    <script>
+        // Listen for click on the button to reset the form if "Retry" is clicked
+        document.querySelector("button[type='submit']").addEventListener("click", function() {
+            if (this.textContent === "Retry") {
+                resetForm(); // Call reset function
+            }
+        });
+    </script>
 </body>
 </html>

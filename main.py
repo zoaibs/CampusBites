@@ -19,16 +19,25 @@ def load_menu_data(json_file, dining_hall, meal_type):
 
 # Define the user profile
 def get_user_profile(weight, weight_goal, gender, height):
-    return {'weight': int(weight), 'weight_goal': int(weight_goal), 'gender': gender, 'height': int(height)}
+    return {'weight': weight, 'weight_goal': weight_goal, 'gender': gender, 'height': height}
 
 # Estimate daily caloric needs using the Mifflin-St Jeor formula
 # Estimate daily caloric needs using the Mifflin-St Jeor formula
-def estimate_daily_calories(user_profile, goal_time_weeks):
-    weight = int(user_profile['weight'])
+def check_weight_change_safety(weight, goal_weight, goal_time_weeks):
+    weight_goal_diff = int(goal_weight) - int(weight)
+    weight_change_per_week = weight_goal_diff / float(goal_time_weeks)
+
+    # Check for safe weight change limits
+    if weight_change_per_week > 1:
+        return "Warning: Gaining more than 1 kg per week is not advised. Please choose a safer goal."
+    elif weight_change_per_week < -1:
+        return "Warning: Losing more than 1 kg per week is not advised. Please choose a safer goal."
+
+    return None  # No warning needed
+def estimate_daily_calories(user_profile, goal_time_weeks, bmr_scale):
+    weight = user_profile['weight']
     gender = user_profile['gender']
-    height = int(user_profile['height'])
-
-    print(type(height))
+    height = user_profile['height']
 
     print(type(height))
 
@@ -39,10 +48,10 @@ def estimate_daily_calories(user_profile, goal_time_weeks):
     weight_change_per_week = weight_goal_diff / float(goal_time_weeks)
 
     # Check for safe weight change limits
-    if weight_change_per_week > 1:
-        print("Warning: Gaining more than 1 kg per week is not advised. Are you sure you want to proceed?")
-    elif weight_change_per_week < -1:
-        print("Warning: Losing more than 1 kg per week is not advised. Are you sure you want to proceed?")
+    # if weight_change_per_week > 1:
+    #     print("Warning: Gaining more than 1 kg per week is not advised. Are you sure you want to proceed?")
+    # elif weight_change_per_week < -1:
+    #     print("Warning: Losing more than 1 kg per week is not advised. Are you sure you want to proceed?")
 
     # Base calorie calculation using Mifflin-St Jeor formula
     if gender.upper() == 'MALE':
@@ -54,7 +63,7 @@ def estimate_daily_calories(user_profile, goal_time_weeks):
     daily_caloric_change = (weight_change_per_week * 7700) / 7  # Daily caloric change
     print(daily_caloric_change)
     # Calculate daily caloric needs based on weight change goal
-    bmr = bmr*1.55
+    bmr = bmr*bmr_scale
     daily_calories = bmr + daily_caloric_change  # Subtract caloric deficit
 
     print(f"Estimated Daily Calories: {daily_calories:.2f} kcal")
@@ -147,6 +156,7 @@ def recommend_meal(model, menu, daily_calories):
             if name not in meal:
                 meal.append(name)
             else:
+                print("SKIBIDISKIBIDIDOO - DUPLICATE FOUND")
                 idx = meal.index(name)
                 if 'two servings' in meal[idx]['name']:
                     meal[idx]['name'] = meal[idx]['name'].replace('two servings', 'three servings')
@@ -206,10 +216,9 @@ def display_meal(meal, total_calories, total_protein, total_fat, total_carbs, to
     print(f"Total Vitamins: {total_vitamins} (arbitrary units)")
     print(f"Total Minerals: {total_minerals} (arbitrary units)")
 
-def process_user_data(height, weight, goal_weight, goal_time, gender, dining_hall, meal_type):
-    
+def process_user_data(height, weight, goal_weight, goal_time, gender, dining_hall, meal_type, bmr_scale):
     # Load menu data
-
+    bmr_scale = float(bmr_scale)
     height = int(height)
     weight = int(weight)
     goal_weight = int(goal_weight)
@@ -219,32 +228,28 @@ def process_user_data(height, weight, goal_weight, goal_time, gender, dining_hal
         print("No menu items were loaded. Exiting.")
         return
 
-    height = int(height)
-    weight = int(weight)
-    goal_weight = int(goal_weight)
-    goal_time = int(goal_time)
-
     # Create a user profile
-    user_profile = get_user_profile(int(weight), int(goal_weight), gender, int(height))
+    user_profile = get_user_profile(weight, goal_weight, gender, height)
 
     # Convert goal_time from months to weeks
     goal_time_weeks = goal_time * 4  # Assuming 4 weeks in a month
 
     # Estimate daily caloric needs
-    meal_calories = estimate_daily_calories(user_profile, goal_time_weeks) / 3  # Dividing by 3 for meal planning
+    meal_calories = estimate_daily_calories(user_profile, goal_time_weeks, bmr_scale) / 3  # Dividing by 3 for meal planning
     print(f"Estimated Daily Calories: {meal_calories} kcal")
 
     # Train the model using the loaded menu
     model = train_model(menu)
     if model is None:
         print("Could not train the model. Exiting.")
-        return
+        return [], 0, 0, 0, 0, 0, 0, 0
 
     # Recommend a meal based on daily caloric needs
     meal, total_calories, total_protein, total_fat, total_carbs, total_fiber, total_vitamins, total_minerals = recommend_meal(model, menu, meal_calories)
 
     # Display the recommended meal plan
     display_meal(meal, total_calories, total_protein, total_fat, total_carbs, total_fiber, total_vitamins, total_minerals)
+    return meal, total_calories, total_protein, total_fat, total_carbs, total_fiber, total_vitamins, total_minerals
 
 if __name__ == "__main__":
-    process_user_data(170, 60, 70, 3, "male", "North Ave Dining Hall", "Dinner")
+    process_user_data(170, 60, 70, 3, "male", "North Ave Dining Hall", "Dinner", 1.2)

@@ -8,7 +8,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap');
         
         body {
-            font-family: Comfortaa;
+            font-family: Comfortaa, sans-serif;
             background-image: url("/static/blobs-corner-bg.svg");
             background-position-y: -8.5em;
             background-repeat: no-repeat;
@@ -17,144 +17,157 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             background-color: #ffffff;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         h1 {
             font-size: 2.5rem;
             font-weight: bold;
             margin-bottom: 20px;
+            text-align: center;
         }
 
         .meal-text {
-            color: #00bf63; /* Green for "Your suggested meal" */
+            color: #00bf63;
             font-weight: bold;
         }
 
-        .meal-name {
-            color: black; /* Black for meal name */
-            font-weight: normal;
-        }
-
-        table {
-            width: 60%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-bottom: 1em;
-            border: 1px solid black;
-            border-radius: 1px;
+        .table-container {
+            width: 80%;
+            max-width: 800px;
+            margin-bottom: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
 
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
         td, th {
-            border: 1px solid black;
-            padding: 10px;
-            text-align: center;
-            font-size: 1.2rem;
+            padding: 15px;
+            text-align: left;
+            font-size: 1.1rem;
+            border-bottom: 1px solid #e0e0e0;
         }
 
         th {
             font-weight: bold;
-            background-color: #f0f0f0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
         }
 
         .section-title {
             font-size: 1.5rem;
             font-weight: bold;
-            margin-bottom: 0.3em;
+            margin: 1em 0 0.5em;
+            text-align: center;
         }
 
         .macros {
-            font-size: 1.2rem;
-            font-weight: bold;
-            width: 30%;
-            text-align: center; /* Center horizontally */
-            margin-bottom: 1em;
-            border: 1px solid black;
-            border-radius: 1px;
-            overflow: hidden;
+            width: 100%;
         }
 
-        .macros td {
-            padding: 10px;
-            border: 1px solid black;
+        .macros td:first-child {
+            font-weight: bold;
+            color: #00bf63;
         }
 
         button {
-            font-family: Comfortaa;
-            padding: 10px;
+            font-family: Comfortaa, sans-serif;
+            padding: 12px 24px;
             font-size: 1rem;
-            background-color: #fff;
-            border: 2px solid #000;
-            border-radius: 3px;
+            background-color: #00bf63;
+            color: white;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
         button:hover {
-            background-color: #00bf63; /* Accent green for hover effect */
-            color: white;
-            border: 2px solid #00bf63; /* Match border with hover color */
+            background-color: #00a552;
         }
 
         a {
-            text-decoration: none; /* Remove underline from links */
+            text-decoration: none;
         }
 
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
     </style>
 </head>
 <body>
-    <h1><span class="meal-text">Your Meal:</span> <span class="meal-name">Caesar Chicken Salad</span></h1>
-    
+    <h1><span class="meal-text">Your Meal</span></h1>
+
     <div class="section-title">Ingredients</div>
+    
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Ingredient</th>
+                    <th>Calories</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in meal_info['meal'] %}
+                <tr>
+                    <td>{{ item['name'] }}</td>
+                    <td>{{ item['calories'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-    <table>
-        <tr>
-            <th>Ingredient</th>
-            <th>Serving Size</th>
-            <th>Calories</th>
-        </tr>
-        <tr>
-            <td>Chicken</td>
-            <td>--- g</td>
-            <td>--- kcal</td>
-        </tr>
-        <tr>
-            <td>Salad</td>
-            <td>--- g</td>
-            <td>--- kcal</td>
-        </tr>
-    </table>
+    <div class="section-title">Total Macros</div>
 
-    <div class="section-title">Total Macros:</div>
-
-    <table class="macros">
-        <tr>
-            <td>Fat:</td>
-            <td>--- g</td>
-        </tr>
-        <tr>
-            <td>Protein:</td>
-            <td>--- g</td>
-        </tr>
-        <tr>
-            <td>Carbs:</td>
-            <td>--- g</td>
-        </tr>
-        <tr>
-            <td>Vitamins:</td>
-            <td>--- g</td>
-        </tr>
-        <tr>
-            <td>Minerals:</td>
-            <td>--- g</td>
-        </tr>
-        <tr>
-            <td>Fiber:</td>
-            <td>--- g</td>
-        </tr>
-    </table>
+    <div class="table-container">
+        <table class="macros">
+            <tr>
+                <td>Calories:</td>
+                <td>{{ meal_info['total_calories'] }} kcal</td>
+            </tr>
+            <tr>
+                <td>Protein:</td>
+                <td>{{ meal_info['total_protein'] }} g</td>
+            </tr>
+            <tr>
+                <td>Fat:</td>
+                <td>{{ meal_info['total_fat'] }} g</td>
+            </tr>
+            <tr>
+                <td>Carbs:</td>
+                <td>{{ meal_info['total_carbs'] }} g</td>
+            </tr>
+            <tr>
+                <td>Fiber:</td>
+                <td>{{ meal_info['total_fiber'] }} g</td>
+            </tr>
+            <tr>
+                <td>Vitamins:</td>
+                <td>{{ meal_info['total_vitamins'] }} g</td>
+            </tr>
+            <tr>
+                <td>Minerals:</td>
+                <td>{{ meal_info['total_minerals'] }} g</td>
+            </tr>
+        </table>
+    </div>
 
     <a href="{{ url_for('form') }}">
         <button>Go Back</button>
